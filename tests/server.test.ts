@@ -54,7 +54,7 @@ test('actual server entry point recovers unfinished work, releases ownership, an
   try {
     child = await launch(path, port);
     const health = await (await fetch(`http://127.0.0.1:${port}/health`)).json();
-    assert.equal(health.phase, 7); assert.equal(health.tokenConfigured, false);
+    assert.equal(health.status, 'ok'); assert.equal(health.phase, undefined); assert.equal(health.tokenConfigured, false);
     const recovered = (await (await fetch(`http://127.0.0.1:${port}/api/runs/${run.id}`)).json()).run;
     assert.equal(recovered.status, 'interrupted'); assert.equal(recovered.interruptionReason, 'server_restart');
     assert.equal(recovered.projects[0].state, 'interrupted');

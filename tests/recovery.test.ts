@@ -25,7 +25,33 @@ test('version 1 database migrates in place without changing existing run IDs or 
     assert.deepEqual(store.getRun('phase2-run')?.requestedProjectIds, [101]);
     assert.equal(store.getRun('phase2-run')?.interruptionReason, null);
     const check = new DatabaseSync(fixture.path);
-    try { assert.equal(check.prepare('PRAGMA user_version').get()?.user_version, 2); } finally { check.close(); }
+    try { assert.equal(check.prepare('PRAGMA user_version').get()?.user_version, 3); } finally { check.close(); }
+  } finally { store.close(); fixture.cleanup(); }
+});
+test('startup recovery keeps checkpointed reads and leaves an unread project interrupted', async () => {
+  const fixture = setup(); let store = new EvidenceStore(fixture.path);
+  const run = store.createRun([101, 202]); store.startRun(run.id); store.startProject(run.id, 101);
+  const snapshot = { requestedProjectId: 101, startedAt: '2026-10-22T07:17:19.049Z', finishedAt: '2026-10-22T07:17:20.049Z',
+    outcome: 'partial' as const, posture: 'unknown' as const,
+    project: { status: 'collected' as const, value: { id: 101, name: 'Synthetic empty project', web_url: 'https://gitlab.com/synthetic/101', visibility: 'private', default_branch: 'main', empty_repo: true },
+      sources: [{ url: 'https://gitlab.com/api/v4/projects/101', observedAt: '2026-10-22T07:17:19.049Z', httpStatus: 200, attempts: 1, error: null }] },
+    branch: { status: 'not_collected' as const, value: null, sources: [] },
+    protectionRules: { status: 'not_collected' as const, value: null, sources: [] }, matchingRules: [], issues: [] };
+  store.checkpoint(run.id, snapshot); store.close();
+  store = new EvidenceStore(fixture.path);
+  try {
+    assert.equal(store.getRun(run.id)?.status, 'running');
+    assert.equal(store.getRun(run.id)?.projects[0]?.evidence, null);
+    const service = new CollectionService({ store, clientFactory: signal => new GitLabClient({ token: 'unused-test', signal }) });
+    assert.equal(service.start(), 1);
+    const recovered = store.getRun(run.id);
+    assert.equal(recovered?.status, 'interrupted');
+    assert.equal(recovered?.interruptionReason, 'server_restart');
+    assert.equal(recovered?.projects[0]?.state, 'partial');
+    assert.equal(recovered?.projects[0]?.evidence?.project.value?.name, 'Synthetic empty project');
+    assert.equal(recovered?.projects[1]?.state, 'interrupted');
+    assert.equal(recovered?.projects[1]?.evidence, null);
+    await service.stop();
   } finally { store.close(); fixture.cleanup(); }
 });
 test('opening history does not recover work; owned collector startup recovers unfinished runs', async () => {

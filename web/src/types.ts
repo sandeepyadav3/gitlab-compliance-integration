@@ -5,5 +5,5 @@ export type Run = ReturnType<typeof runView>;
 export type Project = Run['projects'][number];
 export type Reference = NonNullable<ReturnType<typeof projectReferenceView>>;
 export interface ProjectState { latest: Reference | null; lastComplete: Reference | null; }
-export interface Health { status: string; phase: number; tokenConfigured: boolean; }
+export interface Health { status: string; tokenConfigured: boolean; }
 export interface Selection { projectIds: number[]; updatedAt: string | null; }

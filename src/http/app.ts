@@ -51,7 +51,7 @@ export function createApplication(options: AppOptions) {
       }
       const url = new URL(request.url ?? '/', 'http://127.0.0.1');
       const route = url.pathname; const method = request.method;
-      if (method === 'GET' && route === '/health') { send(200, { status: 'ok', phase: 7, tokenConfigured: options.tokenConfigured }); return; }
+      if (method === 'GET' && route === '/health') { send(200, { status: 'ok', tokenConfigured: options.tokenConfigured }); return; }
       if (route === '/api/selection' && method === 'GET') { send(200, options.store.getSelection()); return; }
       if (route === '/api/selection' && method === 'PUT') {
         const parsed = selectionSchema.safeParse(await jsonBody(request));

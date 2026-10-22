@@ -5,6 +5,7 @@ import type { AddressInfo } from 'node:net';
 import { GitLabClient } from '../src/gitlab/client.ts';
 import { collectProject, matchesRule, parseProjectIds } from '../src/gitlab/collector.ts';
 import { projectSchema } from '../src/gitlab/schemas.ts';
+import type { ProjectEvidence } from '../src/gitlab/types.ts';
 
 type Reply = { status?: number; body?: unknown; headers?: Record<string, string>; hang?: boolean };
 const project = { id: 101, name: 'Example', web_url: 'https://gitlab.com/synthetic/example', visibility: 'private', default_branch: 'main', empty_repo: false };
@@ -185,6 +186,20 @@ test('project selection validates and deduplicates numeric IDs', () => {
   for (const input of [[], ['0'], ['-1'], ['abc'], ['1.5'], ['9007199254740992']]) assert.throws(() => parseProjectIds(input));
 });
 
+test('progress snapshots stay non-baseline and record the project before later reads', async () => {
+  const seen: ProjectEvidence[] = [];
+  await mocked([{ body: { ...project, secret_extra: 'discarded' } }, { body: { name: 'main', protected: true } }, { body: [rule] }], async client => {
+    const value = await collectProject(client, 101, snapshot => seen.push(snapshot));
+    assert.equal(value.outcome, 'complete');
+    assert.ok(seen.length >= 3);
+    assert.equal(seen[0]?.project.status, 'collected');
+    assert.equal(seen[0]?.branch.status, 'not_collected');
+    assert.equal(seen.some(snapshot => snapshot.branch.status === 'collected' && snapshot.protectionRules.status === 'not_collected'), true);
+    assert.equal(seen.at(-1)?.protectionRules.status, 'collected');
+    assert.equal(seen.every(snapshot => snapshot.outcome !== 'complete'), true);
+    assert.equal(seen.some(snapshot => JSON.stringify(snapshot).includes('secret_extra')), false);
+  });
+});
 test('live-response regression: empty repository can report configured default_branch main', async () => {
   await mocked([{ body: { ...project, default_branch: 'main', empty_repo: true } }], async (client, requests) => {
     const value = await collectProject(client, 101);

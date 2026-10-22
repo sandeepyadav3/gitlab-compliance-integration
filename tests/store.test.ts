@@ -20,6 +20,13 @@ function empty(id = 101): ProjectEvidence {
     branch: { status: 'not_applicable', value: null, sources: [] },
     protectionRules: { status: 'not_applicable', value: null, sources: [] }, matchingRules: [], issues: [] };
 }
+function partial(id = 101): ProjectEvidence {
+  const evidence = empty(id);
+  evidence.outcome = 'partial'; evidence.posture = 'unknown';
+  evidence.branch = { status: 'not_collected', value: null, sources: [] };
+  evidence.protectionRules = { status: 'not_collected', value: null, sources: [] };
+  return evidence;
+}
 function failed(id = 101): ProjectEvidence {
   const evidence = empty(id);
   evidence.outcome = 'failed'; evidence.posture = 'unknown';
@@ -116,6 +123,33 @@ test('completion rejects missing outcomes; mixed complete/failed results are ret
     store.recordEvidence(run.id, failed(202)); store.completeRun(run.id);
     assert.equal(store.getRun(run.id)?.status, 'completed');
     assert.deepEqual(store.getRun(run.id)?.projects.map(project => project.state), ['complete', 'failed']);
+  });
+});
+test('a checkpoint becomes partial evidence on interrupt and a project without one stays empty', () => {
+  withStore((store, path) => {
+    const run = store.createRun([101, 202]); store.startRun(run.id); store.startProject(run.id, 101);
+    store.checkpoint(run.id, partial());
+    store.interruptRun(run.id);
+    const projects = store.getRun(run.id)?.projects;
+    assert.equal(projects?.[0]?.state, 'partial');
+    assert.equal(projects?.[0]?.evidence?.outcome, 'partial');
+    assert.equal(projects?.[0]?.evidence?.project.value?.name, 'Synthetic empty project');
+    assert.equal(projects?.[1]?.state, 'interrupted');
+    assert.equal(projects?.[1]?.evidence, null);
+    const raw = new DatabaseSync(path);
+    try { assert.equal(Number(raw.prepare('SELECT COUNT(*) AS count FROM collection_checkpoints').get()?.count), 0); }
+    finally { raw.close(); }
+  });
+});
+test('recording a terminal observation removes its checkpoint', () => {
+  withStore((store, path) => {
+    const run = store.createRun([101]); store.startRun(run.id); store.startProject(run.id, 101);
+    store.checkpoint(run.id, partial());
+    store.recordEvidence(run.id, empty());
+    assert.equal(store.getRun(run.id)?.projects[0]?.state, 'complete');
+    const raw = new DatabaseSync(path);
+    try { assert.equal(Number(raw.prepare('SELECT COUNT(*) AS count FROM collection_checkpoints').get()?.count), 0); }
+    finally { raw.close(); }
   });
 });
 test('interruption accounts for unfinished projects and preserves completed observations', () => {

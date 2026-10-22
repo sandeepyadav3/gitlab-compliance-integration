@@ -80,7 +80,7 @@ export class CollectionService {
           const id = run.requestedProjectIds[next++]; if (id === undefined) return;
           this.#store.startProject(run.id, id);
           let evidence: ProjectEvidence;
-          try { evidence = await this.#collector(client, id); }
+          try { evidence = await this.#collector(client, id, snapshot => this.#store.checkpoint(run.id, snapshot)); }
           catch (error) { controller.abort(controller.signal.reason ?? 'execution_failure'); throw error; }
           controller.signal.throwIfAborted();
           this.#store.recordEvidence(run.id, evidence);

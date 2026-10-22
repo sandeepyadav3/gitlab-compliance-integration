@@ -10,7 +10,20 @@ export function matchesRule(pattern: string, branch: string): boolean {
 }
 const unavailable = <T>(): Observation<T> => ({ status: 'not_collected', value: null, sources: [] });
 
-export async function collectProject(client: GitLabClient, projectId: number): Promise<ProjectEvidence> {
+function publish(evidence: ProjectEvidence, onProgress?: (evidence: ProjectEvidence) => void): void {
+  if (!onProgress) return;
+  const hasFact = evidence.project.status !== 'not_collected' || evidence.branch.status !== 'not_collected'
+    || evidence.protectionRules.status !== 'not_collected' || evidence.issues.length > 0;
+  if (!hasFact) return;
+  const copy = structuredClone(evidence);
+  copy.finishedAt = new Date().toISOString();
+  if (copy.finishedAt < copy.startedAt) copy.finishedAt = copy.startedAt;
+  // A progress copy is never a baseline. The returned snapshot can still be complete.
+  if (copy.outcome === 'complete') copy.outcome = 'partial';
+  onProgress(copy);
+}
+
+export async function collectProject(client: GitLabClient, projectId: number, onProgress?: (evidence: ProjectEvidence) => void): Promise<ProjectEvidence> {
   if (!Number.isSafeInteger(projectId) || projectId < 1) throw new Error('Project IDs must be positive safe integers.');
   const evidence: ProjectEvidence = {
     requestedProjectId: projectId, startedAt: new Date().toISOString(), finishedAt: '',
@@ -37,13 +50,15 @@ export async function collectProject(client: GitLabClient, projectId: number): P
     } else if (result.value.default_branch === null) {
       issue('No default branch was returned, but an empty repository was not confirmed.');
     } else {
+      publish(evidence, onProgress);
       const branchName = result.value.default_branch;
       const branchResult = await client.get(`/projects/${projectId}/repository/branches/${encodeURIComponent(branchName)}`, branchSchema);
       evidence.branch = { status: branchResult.value ? 'collected' : 'failed', value: branchResult.value, sources: [branchResult.source] };
       if (branchResult.value?.name === branchName) {
         evidence.posture = branchResult.value.protected ? 'protected' : 'unprotected';
       } else if (branchResult.value) issue('The returned branch did not match the requested default branch.');
-      evidence.protectionRules = await collectRules(client, projectId);
+      publish(evidence, onProgress);
+      evidence.protectionRules = await collectRules(client, projectId, evidence, () => publish(evidence, onProgress));
       evidence.matchingRules = (evidence.protectionRules.value ?? []).filter(rule => matchesRule(rule.name, branchName));
       if (evidence.protectionRules.status === 'collected' && branchResult.value?.name === branchName) {
         const hasRules = evidence.matchingRules.length > 0;
@@ -52,11 +67,13 @@ export async function collectProject(client: GitLabClient, projectId: number): P
       if (evidence.branch.status === 'collected' && evidence.protectionRules.status === 'collected' && !evidence.issues.length) evidence.outcome = 'complete';
     }
   }
+  publish(evidence, onProgress);
   evidence.finishedAt = new Date().toISOString();
   return evidence;
 }
-async function collectRules(client: GitLabClient, projectId: number): Promise<Observation<ProtectionRule[]>> {
+async function collectRules(client: GitLabClient, projectId: number, evidence: ProjectEvidence, notify: () => void): Promise<Observation<ProtectionRule[]>> {
   const observation: Observation<ProtectionRule[]> = { status: 'failed', value: null, sources: [] };
+  evidence.protectionRules = observation;
   const rules: ProtectionRule[] = [];
   let page = 1;
   const seen = new Set<number>();
@@ -67,6 +84,7 @@ async function collectRules(client: GitLabClient, projectId: number): Promise<Ob
     if (!result.value) {
       observation.status = rules.length ? 'partial' : 'failed';
       observation.value = rules.length ? rules : null;
+      notify();
       return observation;
     }
     rules.push(...result.value);
@@ -74,8 +92,10 @@ async function collectRules(client: GitLabClient, projectId: number): Promise<Ob
     // Header may be absent; request one extra page for an exactly full page.
     if (result.nextPage === '' || (result.nextPage === null && result.value.length < 100)) {
       observation.status = 'collected';
+      notify();
       return observation;
     }
+    notify();
     const next = result.nextPage === null ? page + 1 : Number(result.nextPage);
     if (!Number.isSafeInteger(next) || next <= page || seen.has(next)) break;
     page = next;
@@ -83,6 +103,7 @@ async function collectRules(client: GitLabClient, projectId: number): Promise<Ob
   const error: CollectionError = { code: 'pagination_limit', message: 'Protection rule pagination was incomplete or exceeded 20 pages.', action: 'Inspect API pagination and collect again. Listed rules may be incomplete.' };
   observation.status = 'partial';
   observation.sources.push({ url: `https://gitlab.com/api/v4/projects/${projectId}/protected_branches`, observedAt: new Date().toISOString(), httpStatus: null, attempts: 0, error });
+  notify();
   return observation;
 }
 export function parseProjectIds(values: string[]): number[] {

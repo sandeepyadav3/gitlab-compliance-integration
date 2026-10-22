@@ -4,6 +4,7 @@ import { mkdirSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { schema } from './schema.ts';
 import { migration2 } from './migration-2.ts';
+import { migration3 } from './migration-3.ts';
 import { parseProjectIds } from '../gitlab/collector.ts';
 import { projectEvidenceSchema } from '../gitlab/schemas.ts';
 import type { ProjectEvidence } from '../gitlab/types.ts';
@@ -40,7 +41,8 @@ export class EvidenceStore {
         const version = this.#db.prepare('PRAGMA user_version').get()?.user_version;
         if (version === 0) this.#db.exec(schema);
         if (version === 0 || version === 1) this.#db.exec(migration2);
-        else if (version !== 2) throw new Error('Unsupported database version. Use the matching application version.');
+        if (version === 0 || version === 1 || version === 2) this.#db.exec(migration3);
+        else if (version !== 3) throw new Error('Unsupported database version. Use the matching application version.');
       });
     } catch (error) { this.#db.close(); throw error; }
   }
@@ -92,8 +94,8 @@ export class EvidenceStore {
       if (result.changes !== 1) throw new Error('Project must be pending in a running run.');
     });
   }
-  recordEvidence(id: string, input: ProjectEvidence): void {
-    // Parse selected evidence again at the persistence boundary; discard unknown fields.
+  // Parse selected evidence again at the persistence boundary; discard unknown fields.
+  #validated(input: ProjectEvidence): ProjectEvidence {
     const evidence = projectEvidenceSchema.parse(input);
     if (evidence.finishedAt < evidence.startedAt) throw new Error('Evidence timestamps are out of order.');
     if (evidence.project.value && evidence.project.value.id !== evidence.requestedProjectId) {
@@ -117,12 +119,33 @@ export class EvidenceStore {
         }
       }
     }
+    return evidence;
+  }
+  checkpoint(runId: string, input: ProjectEvidence): void {
+    const evidence = this.#validated(input);
+    if (evidence.outcome !== 'partial' && evidence.outcome !== 'failed') throw new Error('Checkpoints must be partial or failed observations.');
+    this.#writeTransaction(() => {
+      const result = this.#db.prepare(`INSERT INTO collection_checkpoints(run_id, project_id, evidence_json)
+        SELECT ?, ?, ? WHERE EXISTS (
+          SELECT 1 FROM run_projects WHERE run_id=? AND project_id=? AND state='running'
+        ) AND EXISTS (SELECT 1 FROM runs WHERE id=? AND status='running')
+        ON CONFLICT(run_id, project_id) DO UPDATE SET evidence_json=excluded.evidence_json
+        WHERE EXISTS (
+          SELECT 1 FROM run_projects WHERE run_id=collection_checkpoints.run_id
+            AND project_id=collection_checkpoints.project_id AND state='running')`)
+        .run(runId, evidence.requestedProjectId, JSON.stringify(evidence), runId, evidence.requestedProjectId, runId);
+      if (result.changes !== 1) throw new Error('Checkpoint must belong to a running project.');
+    });
+  }
+  recordEvidence(id: string, input: ProjectEvidence): void {
+    const evidence = this.#validated(input);
     this.#writeTransaction(() => {
       const result = this.#db.prepare(`UPDATE run_projects SET state=?, evidence_json=?
         WHERE run_id=? AND project_id=? AND state IN ('pending','running')
         AND EXISTS (SELECT 1 FROM runs WHERE id=? AND status='running')`)
         .run(evidence.outcome, JSON.stringify(evidence), id, evidence.requestedProjectId, id);
       if (result.changes !== 1) throw new Error('Evidence must belong to an unfinished project in a running run.');
+      this.#db.prepare('DELETE FROM collection_checkpoints WHERE run_id=? AND project_id=?').run(id, evidence.requestedProjectId);
     });
   }
 
@@ -140,6 +163,7 @@ export class EvidenceStore {
       const result = this.#db.prepare("UPDATE runs SET status='interrupted', finished_at=?, interruption_reason=? WHERE id=? AND status IN ('queued','running')")
         .run(new Date().toISOString(), reason, id);
       if (result.changes !== 1) throw new Error('Only unfinished runs can be interrupted.');
+      this.#promoteCheckpoints(id);
       this.#db.prepare("UPDATE run_projects SET state='interrupted' WHERE run_id=? AND state IN ('pending','running')").run(id);
     });
   }
@@ -182,10 +206,28 @@ export class EvidenceStore {
       const stamp = new Date().toISOString();
       for (const row of active) {
         this.#db.prepare("UPDATE runs SET status='interrupted',finished_at=?,interruption_reason='server_restart' WHERE id=?").run(stamp, row.id!);
+        this.#promoteCheckpoints(String(row.id));
         this.#db.prepare("UPDATE run_projects SET state='interrupted' WHERE run_id=? AND state IN ('pending','running')").run(row.id!);
       }
       return active.length;
     });
+  }
+  // A checkpoint is a scratch copy of reads already returned. Promotion runs before
+  // leftover rows are marked interrupted, and only while this write transaction is open.
+  #promoteCheckpoints(runId: string): void {
+    const rows = this.#db.prepare('SELECT project_id, evidence_json FROM collection_checkpoints WHERE run_id=?').all(runId);
+    for (const row of rows) {
+      const projectId = Number(row.project_id);
+      try {
+        const evidence = this.#validated(JSON.parse(String(row.evidence_json)) as ProjectEvidence);
+        if ((evidence.outcome === 'partial' || evidence.outcome === 'failed') && evidence.requestedProjectId === projectId) {
+          this.#db.prepare(`UPDATE run_projects SET state=?, evidence_json=?
+            WHERE run_id=? AND project_id=? AND state IN ('pending','running')`)
+            .run(evidence.outcome, JSON.stringify(evidence), runId, projectId);
+        }
+      } catch { /* An unreadable scratch copy cannot become evidence. */ }
+      this.#db.prepare('DELETE FROM collection_checkpoints WHERE run_id=? AND project_id=?').run(runId, projectId);
+    }
   }
   getActiveRun(): Run | null {
     const row = this.#db.prepare("SELECT id FROM runs WHERE status IN ('queued','running') ORDER BY sequence DESC LIMIT 1").get();
