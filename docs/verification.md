@@ -8,14 +8,11 @@ Verified 2026-10-22 in the coding environment:
   `npm run verify` command. Documentation relative links resolve.
 - Final package version is 0.7.0. HTTP health reports status and token configuration only.
   Storage schema is 3. The CLI output contract remains 4.
-  No storage reset or history rewrite is required.
 
 - Backend and frontend TypeScript checks and production client build pass on Node
   24.19.0 and independently installed Node 22.17.0.
 - Backend tests pass on both runtimes. Existing migration, comparison, bounded
   concurrency, ownership, cancellation, persistence and recovery coverage remains passing.
-- The actual server-entry-point test retains the Windows-compatible private IPC
-  shutdown correction. No public shutdown endpoint or skipped test was introduced.
 - The Playwright browser smoke check passes on both runtimes against the real backend,
   SQLite and a local GitLab HTTP mock. It covers saved selection, collection, refresh
   reconnection, force-push changes, partial failure, fixed historical fallback, recovery,
@@ -37,15 +34,15 @@ Live-account provenance: HTTP run 8b292169-02ab-434f-9fcd-ebb370494e31 confirmed
 complete results, 100% progress, and baseline references to the first persisted run.
 A later live pass confirmed force-push changes in both directions. The built UI showed
 all three project details and the corresponding historical changes. These checks were
-made against the seeded GitLab account, not from the coding environment. The sanitized
-live recording is still outstanding. The mocked failure demo and its synthetic JSON
-evidence are included.
+made against the seeded GitLab account, not from the coding environment. The screen
+recording is linked from the README:
+https://drive.google.com/file/d/1-kZmV2F_UDa1GbOhmmycZU1QuiJUWBiC/view?usp=drive_link
+The mocked failure demo and its synthetic JSON evidence are included.
 
-Tests ran on Linux. Native Windows was not available in that environment. Node 22.17.0 is explicitly
+Tests ran on Linux. Node 22.17.0 is explicitly
 supported by the npm-script type-stripping flag; experimental type stripping/SQLite
 warnings are expected and not globally suppressed. No credentials, private databases,
 browser binaries or mock screenshots are packaged.
 
 The interactive mocked failure/recovery flow was also checked, including re-enabling
-the failure and repeating recovery. The README contains a deliberate Loom placeholder;
-no recording link is claimed here.
+the failure and repeating recovery.

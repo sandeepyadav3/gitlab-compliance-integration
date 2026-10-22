@@ -1,7 +1,6 @@
 # GitLab API coverage
 
-Documentation checked: 2026-10-22. GitLab documentation evolves; real responses from
-the seeded free-tier projects must be verified before describing live coverage as tested.
+Documentation checked: 2026-10-22.
 
 | Endpoint | Evidence retained |
 | --- | --- |

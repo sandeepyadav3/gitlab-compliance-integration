@@ -61,8 +61,7 @@ real provider failures. It supplements rather than replaces the live GitLab walk
 - Local history has no retention/deletion policy. In-flight reads are checkpointed and
   promoted to partial or failed evidence on interrupt or restart. Projects that have not
   returned a read stay interrupted. Collection does not resume an old run.
-- Node 22 native SQLite/type stripping is experimental. Linux Node 22/24 was checked;
-  native Windows was tested by the user for the app, not available in the coding environment.
+- Node 22 native SQLite/type stripping is experimental. Linux Node 22/24 was checked.
   Browser qualification is recorded in verification.md.
 
 ## Priorities before a production deployment

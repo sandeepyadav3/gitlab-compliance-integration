@@ -57,10 +57,11 @@ See frontend.md. Automated checks and this interactive demo serve different purp
 
 ## Live GitLab UI walkthrough (about 3–5 minutes)
 
-Use your normal server and real configured test IDs for this recording, not the mock.
-Live collection of the three project states and force-push changes in both directions
-was checked on the seeded account. The assessment still requires sanitized screenshots
-or a short recording; those must be captured on the machine with the live GitLab session.
+The screen recording linked from the README follows this walkthrough on the normal
+server and the seeded project IDs, not the mock. Live collection of the three project
+states and force-push changes in both directions was checked on the seeded account.
+
+**Screen recording:** [GitLab evidence collection and mocked failure recovery](https://drive.google.com/file/d/1-kZmV2F_UDa1GbOhmmycZU1QuiJUWBiC/view?usp=drive_link)
 
 1. Run `npm run build`, `npm start`; open http://127.0.0.1:3001. Show the saved three
    project IDs and collect. Open each result: protected restrictions, successful empty
@@ -78,14 +79,12 @@ or a short recording; those must be captured on the machine with the live GitLab
 
 ### Capture and sanitization
 
-Include a short recording, or screenshots showing the three project outcomes, the
-changed field with baseline/time, and evidence/source detail. Capture only the app
-and synthetic test settings. Never capture `.env`, PAT pages, terminal environment
-variables, unrelated tabs, account menus, personal email or private non-test projects.
-Crop/redact unrelated personal details and review the final files before committing.
-Place reviewed files under `docs/live-demo/` and add links below or in the README.
-Do not substitute the included mocked JSON for live demonstration evidence.
+The published recording shows the three project outcomes, the changed field with
+baseline and time, and evidence/source detail. It is limited to the app and synthetic
+test settings. It does not include `.env`, PAT pages, terminal environment variables,
+unrelated tabs, account menus, personal email, or private non-test projects. No media
+files are stored in this repository.
 
-**Live media status:** a Loom recording still needs to be added to the README.
-No media or link is included yet. Live validation is recorded in test-projects.md.
-The mocked failure/recovery demo was also run twice.
+**Live media:** [screen recording](https://drive.google.com/file/d/1-kZmV2F_UDa1GbOhmmycZU1QuiJUWBiC/view?usp=drive_link),
+also linked from the README. Live validation notes are in test-projects.md. Do not
+substitute the included mocked JSON for the live portion of the recording.

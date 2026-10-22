@@ -6,9 +6,9 @@ asynchronously into SQLite. All application requests to GitLab are read-only.
 
 ## Demonstration
 
-**Loom recording: TODO — add the reviewed recording link before submission.**
+**Screen recording:** [GitLab evidence collection and mocked failure recovery](https://drive.google.com/file/d/1-kZmV2F_UDa1GbOhmmycZU1QuiJUWBiC/view?usp=drive_link)
 
-The recording should show live collection of the three seeded GitLab projects and a
+The recording shows live collection of the three seeded GitLab projects and a
 protection-setting change, followed by the clearly labeled mocked failure/recovery demo.
 [Recording walkthrough](docs/demos.md) · [Synthetic demo evidence](docs/demo-mocked-evidence.json)
 
@@ -30,14 +30,18 @@ Copy `.env.example` to `.env`. Configure the token **server-side** with `read_ap
 
 ```dotenv
 GITLAB_TOKEN=replace-me
+# Optional. The UI does not read this; enter project IDs in the app.
+# Default for `npm run collect` only when you omit IDs on the command line.
+# If set, the CLI uses it instead of the selection saved in the app.
 GITLAB_PROJECT_IDS=87944794,87944512,87944475
 PORT=3001
 DATABASE_PATH=data/evidence.sqlite
 ```
 
 Never commit the token, expose it through `VITE_` variables, or paste it in chat.
-The IDs are the seeded synthetic test projects; substitute your own when recreating
-the environment. Shell environment variables override `.env`. Tests require no token.
+Leave `GITLAB_PROJECT_IDS` unset when using the UI. The example IDs are the seeded
+test projects, for that CLI default only. Shell environment variables override `.env`.
+Tests require no token.
 
 ## Build and open the application
 
@@ -149,9 +153,7 @@ with localhost mocked GitLab HTTP and its own temporary database, leaving your n
 configuration and history untouched. `npm run demo:verify` runs the credential-free
 scenario assertions and writes synthetic JSON evidence.
 
-See [demo walkthrough and live recording checklist](docs/demos.md). Live collection and
-setting changes were checked on the seeded projects; sanitized live media still needs
-capturing before submission. The included mock evidence is explicitly synthetic.
+See [demo walkthrough](docs/demos.md). The included mock evidence is explicitly synthetic.
 
 ## Recreate the three GitLab projects
 
@@ -174,7 +176,6 @@ existing default branch to assess and skips branch-specific configuration reques
 ## Architecture, limits, verification
 
 - [Architecture, tradeoffs, and production changes](docs/architecture.md)
-- [Submission checklist](docs/submission.md)
 - [Mocked and live demonstrations](docs/demos.md)
 - [Frontend behavior and browser checks](docs/frontend.md)
 - [Storage design and baseline policy](docs/storage-design.md)
@@ -192,7 +193,7 @@ calculation is implemented. Historical baseline references and field-level seman
 
 ## AI assistance
 
-Codex/ChatGPT assisted implementation of the GitLab client, evidence collector,
+Cursor Coding Agent assisted implementation of the GitLab client, evidence collector,
 persistence, HTTP API, worker/recovery logic, comparisons, React UI, demo, docs, and tests.
 Verification included official provider/runtime documentation, TypeScript checks,
 mocked GitLab HTTP exercising the real collector/SQLite/API, process lifecycle tests,
@@ -201,8 +202,7 @@ all three project states, persisted history, force-push changes in both directio
 and the corresponding UI comparisons. The empty-repository response exposed a real
 edge case that was fixed and covered by a regression test. Failure/recovery was also
 checked interactively using the isolated mock. See docs/verification.md for versions,
-platform limits and provenance. The author should be prepared to explain and modify
-the implementation; passing AI-assisted tests alone is not a production-readiness claim.
+platform limits and provenance.
 
 ## Compare collections
 
