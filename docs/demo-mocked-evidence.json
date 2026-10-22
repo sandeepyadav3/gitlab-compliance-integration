@@ -1,0 +1,862 @@
+{
+  "provenance": "SYNTHETIC: actual backend/collector/SQLite with localhost mocked GitLab HTTP. Not live GitLab evidence.",
+  "generatedAt": "2026-10-22T12:29:45.238Z",
+  "verified": [
+    "three project states",
+    "403 preserves known protected status",
+    "other projects complete",
+    "incomplete comparison does not infer removals",
+    "previous complete evidence retained",
+    "recovery skips partial baseline per project",
+    "historical observations unchanged"
+  ],
+  "runs": [
+    {
+      "id": "c7147854-c1a5-4441-a759-ca935a1e7751",
+      "sequence": 1,
+      "requestedProjectIds": [
+        1,
+        2,
+        3
+      ],
+      "status": "completed",
+      "createdAt": "2026-10-22T12:29:45.140Z",
+      "startedAt": "2026-10-22T12:29:45.143Z",
+      "finishedAt": "2026-10-22T12:29:45.190Z",
+      "interruptionReason": null,
+      "projects": [
+        {
+          "projectId": 1,
+          "state": "complete",
+          "baselineRunId": null,
+          "evidence": {
+            "requestedProjectId": 1,
+            "startedAt": "2026-10-22T12:29:45.145Z",
+            "finishedAt": "2026-10-22T12:29:45.184Z",
+            "outcome": "complete",
+            "posture": "protected",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 1,
+                "name": "Synthetic 1",
+                "web_url": "https://gitlab.com/synthetic/1",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1",
+                  "observedAt": "2026-10-22T12:29:45.145Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "collected",
+              "value": {
+                "name": "main",
+                "protected": true
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1/repository/branches/main",
+                  "observedAt": "2026-10-22T12:29:45.165Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "protectionRules": {
+              "status": "collected",
+              "value": [
+                {
+                  "id": 9,
+                  "name": "main",
+                  "push_access_levels": [
+                    {
+                      "access_level": 40
+                    }
+                  ],
+                  "merge_access_levels": [
+                    {
+                      "access_level": 40
+                    }
+                  ],
+                  "allow_force_push": false
+                }
+              ],
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1/protected_branches?per_page=100&page=1",
+                  "observedAt": "2026-10-22T12:29:45.180Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "matchingRules": [
+              {
+                "id": 9,
+                "name": "main",
+                "push_access_levels": [
+                  {
+                    "access_level": 40
+                  }
+                ],
+                "merge_access_levels": [
+                  {
+                    "access_level": 40
+                  }
+                ],
+                "allow_force_push": false
+              }
+            ],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "first_observation",
+            "summary": "First complete observation; no earlier complete baseline exists.",
+            "current": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.184Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": null,
+            "baseline": null,
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": []
+          }
+        },
+        {
+          "projectId": 2,
+          "state": "complete",
+          "baselineRunId": null,
+          "evidence": {
+            "requestedProjectId": 2,
+            "startedAt": "2026-10-22T12:29:45.147Z",
+            "finishedAt": "2026-10-22T12:29:45.189Z",
+            "outcome": "complete",
+            "posture": "unprotected",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 2,
+                "name": "Synthetic 2",
+                "web_url": "https://gitlab.com/synthetic/2",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2",
+                  "observedAt": "2026-10-22T12:29:45.147Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "collected",
+              "value": {
+                "name": "main",
+                "protected": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2/repository/branches/main",
+                  "observedAt": "2026-10-22T12:29:45.169Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "protectionRules": {
+              "status": "collected",
+              "value": [],
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2/protected_branches?per_page=100&page=1",
+                  "observedAt": "2026-10-22T12:29:45.182Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "first_observation",
+            "summary": "First complete observation; no earlier complete baseline exists.",
+            "current": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.189Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": null,
+            "baseline": null,
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": []
+          }
+        },
+        {
+          "projectId": 3,
+          "state": "complete",
+          "baselineRunId": null,
+          "evidence": {
+            "requestedProjectId": 3,
+            "startedAt": "2026-10-22T12:29:45.148Z",
+            "finishedAt": "2026-10-22T12:29:45.171Z",
+            "outcome": "complete",
+            "posture": "no_default_branch",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 3,
+                "name": "Synthetic 3",
+                "web_url": "https://gitlab.com/synthetic/3",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": true
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/3",
+                  "observedAt": "2026-10-22T12:29:45.149Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "not_applicable",
+              "value": null,
+              "sources": []
+            },
+            "protectionRules": {
+              "status": "not_applicable",
+              "value": null,
+              "sources": []
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "first_observation",
+            "summary": "First complete observation; no earlier complete baseline exists.",
+            "current": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.171Z",
+              "defaultBranch": null,
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": null,
+            "baseline": null,
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": []
+          }
+        }
+      ]
+    },
+    {
+      "id": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+      "sequence": 2,
+      "requestedProjectIds": [
+        1,
+        2,
+        3
+      ],
+      "status": "completed",
+      "createdAt": "2026-10-22T12:29:45.196Z",
+      "startedAt": "2026-10-22T12:29:45.198Z",
+      "finishedAt": "2026-10-22T12:29:45.217Z",
+      "interruptionReason": null,
+      "projects": [
+        {
+          "projectId": 1,
+          "state": "partial",
+          "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+          "evidence": {
+            "requestedProjectId": 1,
+            "startedAt": "2026-10-22T12:29:45.199Z",
+            "finishedAt": "2026-10-22T12:29:45.214Z",
+            "outcome": "partial",
+            "posture": "protected",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 1,
+                "name": "Synthetic 1",
+                "web_url": "https://gitlab.com/synthetic/1",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1",
+                  "observedAt": "2026-10-22T12:29:45.199Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "collected",
+              "value": {
+                "name": "main",
+                "protected": true
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1/repository/branches/main",
+                  "observedAt": "2026-10-22T12:29:45.205Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "protectionRules": {
+              "status": "failed",
+              "value": null,
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1/protected_branches?per_page=100&page=1",
+                  "observedAt": "2026-10-22T12:29:45.211Z",
+                  "httpStatus": 403,
+                  "attempts": 1,
+                  "error": {
+                    "code": "forbidden",
+                    "message": "GitLab denied access to this resource.",
+                    "action": "Check account permissions and token scope, then collect again."
+                  }
+                }
+              ]
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "incomplete",
+            "summary": "A full protection comparison is unavailable. Listed differences concern observed facts only.",
+            "current": {
+              "runId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+              "sequence": 2,
+              "observedAt": "2026-10-22T12:29:45.214Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+            "baseline": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.184Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "changes": [],
+            "coverageChanges": [
+              {
+                "field": "rules",
+                "label": "Default-branch protection configuration",
+                "before": "known",
+                "after": "unknown",
+                "message": "Previously observed information is unavailable now; no setting removal is inferred."
+              }
+            ],
+            "unavailableFields": [
+              "rules"
+            ],
+            "notices": [
+              "Configuration comparison is incomplete or ambiguous; missing rules are not treated as removed.",
+              "Unavailable fields are not assumed to be false or empty."
+            ]
+          }
+        },
+        {
+          "projectId": 2,
+          "state": "complete",
+          "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+          "evidence": {
+            "requestedProjectId": 2,
+            "startedAt": "2026-10-22T12:29:45.202Z",
+            "finishedAt": "2026-10-22T12:29:45.216Z",
+            "outcome": "complete",
+            "posture": "unprotected",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 2,
+                "name": "Synthetic 2",
+                "web_url": "https://gitlab.com/synthetic/2",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2",
+                  "observedAt": "2026-10-22T12:29:45.202Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "collected",
+              "value": {
+                "name": "main",
+                "protected": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2/repository/branches/main",
+                  "observedAt": "2026-10-22T12:29:45.207Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "protectionRules": {
+              "status": "collected",
+              "value": [],
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2/protected_branches?per_page=100&page=1",
+                  "observedAt": "2026-10-22T12:29:45.211Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "unchanged",
+            "summary": "No changes in comparable observed fields.",
+            "current": {
+              "runId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+              "sequence": 2,
+              "observedAt": "2026-10-22T12:29:45.216Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+            "baseline": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.189Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": []
+          }
+        },
+        {
+          "projectId": 3,
+          "state": "complete",
+          "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+          "evidence": {
+            "requestedProjectId": 3,
+            "startedAt": "2026-10-22T12:29:45.203Z",
+            "finishedAt": "2026-10-22T12:29:45.208Z",
+            "outcome": "complete",
+            "posture": "no_default_branch",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 3,
+                "name": "Synthetic 3",
+                "web_url": "https://gitlab.com/synthetic/3",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": true
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/3",
+                  "observedAt": "2026-10-22T12:29:45.203Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "not_applicable",
+              "value": null,
+              "sources": []
+            },
+            "protectionRules": {
+              "status": "not_applicable",
+              "value": null,
+              "sources": []
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "unchanged",
+            "summary": "No changes in comparable observed fields.",
+            "current": {
+              "runId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+              "sequence": 2,
+              "observedAt": "2026-10-22T12:29:45.208Z",
+              "defaultBranch": null,
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+            "baseline": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.171Z",
+              "defaultBranch": null,
+              "defaultBranchKnown": true
+            },
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": [
+              "Both repositories are empty; branch protection configuration is not applicable."
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "b5b2ba00-ef3b-4851-a9eb-c57b67f2b108",
+      "sequence": 3,
+      "requestedProjectIds": [
+        1,
+        2,
+        3
+      ],
+      "status": "completed",
+      "createdAt": "2026-10-22T12:29:45.220Z",
+      "startedAt": "2026-10-22T12:29:45.221Z",
+      "finishedAt": "2026-10-22T12:29:45.235Z",
+      "interruptionReason": null,
+      "projects": [
+        {
+          "projectId": 1,
+          "state": "complete",
+          "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+          "evidence": {
+            "requestedProjectId": 1,
+            "startedAt": "2026-10-22T12:29:45.222Z",
+            "finishedAt": "2026-10-22T12:29:45.233Z",
+            "outcome": "complete",
+            "posture": "protected",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 1,
+                "name": "Synthetic 1",
+                "web_url": "https://gitlab.com/synthetic/1",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1",
+                  "observedAt": "2026-10-22T12:29:45.222Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "collected",
+              "value": {
+                "name": "main",
+                "protected": true
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1/repository/branches/main",
+                  "observedAt": "2026-10-22T12:29:45.227Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "protectionRules": {
+              "status": "collected",
+              "value": [
+                {
+                  "id": 9,
+                  "name": "main",
+                  "push_access_levels": [
+                    {
+                      "access_level": 40
+                    }
+                  ],
+                  "merge_access_levels": [
+                    {
+                      "access_level": 40
+                    }
+                  ],
+                  "allow_force_push": false
+                }
+              ],
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/1/protected_branches?per_page=100&page=1",
+                  "observedAt": "2026-10-22T12:29:45.231Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "matchingRules": [
+              {
+                "id": 9,
+                "name": "main",
+                "push_access_levels": [
+                  {
+                    "access_level": 40
+                  }
+                ],
+                "merge_access_levels": [
+                  {
+                    "access_level": 40
+                  }
+                ],
+                "allow_force_push": false
+              }
+            ],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "unchanged",
+            "summary": "No changes in comparable observed fields.",
+            "current": {
+              "runId": "b5b2ba00-ef3b-4851-a9eb-c57b67f2b108",
+              "sequence": 3,
+              "observedAt": "2026-10-22T12:29:45.233Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+            "baseline": {
+              "runId": "c7147854-c1a5-4441-a759-ca935a1e7751",
+              "sequence": 1,
+              "observedAt": "2026-10-22T12:29:45.184Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [
+              "rules[\"main\"].unprotectAccess",
+              "rules[\"main\"].codeOwnerApprovalRequired",
+              "rules[\"main\"].inherited"
+            ],
+            "notices": [
+              "Unavailable fields are not assumed to be false or empty."
+            ]
+          }
+        },
+        {
+          "projectId": 2,
+          "state": "complete",
+          "baselineRunId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+          "evidence": {
+            "requestedProjectId": 2,
+            "startedAt": "2026-10-22T12:29:45.223Z",
+            "finishedAt": "2026-10-22T12:29:45.234Z",
+            "outcome": "complete",
+            "posture": "unprotected",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 2,
+                "name": "Synthetic 2",
+                "web_url": "https://gitlab.com/synthetic/2",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2",
+                  "observedAt": "2026-10-22T12:29:45.223Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "collected",
+              "value": {
+                "name": "main",
+                "protected": false
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2/repository/branches/main",
+                  "observedAt": "2026-10-22T12:29:45.228Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "protectionRules": {
+              "status": "collected",
+              "value": [],
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/2/protected_branches?per_page=100&page=1",
+                  "observedAt": "2026-10-22T12:29:45.231Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "unchanged",
+            "summary": "No changes in comparable observed fields.",
+            "current": {
+              "runId": "b5b2ba00-ef3b-4851-a9eb-c57b67f2b108",
+              "sequence": 3,
+              "observedAt": "2026-10-22T12:29:45.234Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+            "baseline": {
+              "runId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+              "sequence": 2,
+              "observedAt": "2026-10-22T12:29:45.216Z",
+              "defaultBranch": "main",
+              "defaultBranchKnown": true
+            },
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": []
+          }
+        },
+        {
+          "projectId": 3,
+          "state": "complete",
+          "baselineRunId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+          "evidence": {
+            "requestedProjectId": 3,
+            "startedAt": "2026-10-22T12:29:45.224Z",
+            "finishedAt": "2026-10-22T12:29:45.228Z",
+            "outcome": "complete",
+            "posture": "no_default_branch",
+            "project": {
+              "status": "collected",
+              "value": {
+                "id": 3,
+                "name": "Synthetic 3",
+                "web_url": "https://gitlab.com/synthetic/3",
+                "visibility": "private",
+                "default_branch": "main",
+                "empty_repo": true
+              },
+              "sources": [
+                {
+                  "url": "https://gitlab.com/api/v4/projects/3",
+                  "observedAt": "2026-10-22T12:29:45.224Z",
+                  "httpStatus": 200,
+                  "attempts": 1,
+                  "error": null
+                }
+              ]
+            },
+            "branch": {
+              "status": "not_applicable",
+              "value": null,
+              "sources": []
+            },
+            "protectionRules": {
+              "status": "not_applicable",
+              "value": null,
+              "sources": []
+            },
+            "matchingRules": [],
+            "issues": []
+          },
+          "comparison": {
+            "policyVersion": 1,
+            "status": "unchanged",
+            "summary": "No changes in comparable observed fields.",
+            "current": {
+              "runId": "b5b2ba00-ef3b-4851-a9eb-c57b67f2b108",
+              "sequence": 3,
+              "observedAt": "2026-10-22T12:29:45.228Z",
+              "defaultBranch": null,
+              "defaultBranchKnown": true
+            },
+            "baselineRunId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+            "baseline": {
+              "runId": "4a3664ff-9c7c-4aca-8660-44e9ac8c9f62",
+              "sequence": 2,
+              "observedAt": "2026-10-22T12:29:45.208Z",
+              "defaultBranch": null,
+              "defaultBranchKnown": true
+            },
+            "changes": [],
+            "coverageChanges": [],
+            "unavailableFields": [],
+            "notices": [
+              "Both repositories are empty; branch protection configuration is not applicable."
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
