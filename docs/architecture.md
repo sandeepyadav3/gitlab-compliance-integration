@@ -58,8 +58,9 @@ real provider failures. It supplements rather than replaces the live GitLab walk
 - Provider JSON is parsed in memory; no streaming parser or explicit provider response-byte
   cap is implemented. Large responses/history can consume memory. History requests return
   at most 100 runs; the UI shows that recent window rather than unlimited pagination.
-- Local history has no retention/deletion policy. No per-endpoint checkpoint resume:
-  interruption retains finished project snapshots and marks unfinished projects interrupted.
+- Local history has no retention/deletion policy. In-flight reads are checkpointed and
+  promoted to partial or failed evidence on interrupt or restart. Projects that have not
+  returned a read stay interrupted. Collection does not resume an old run.
 - Node 22 native SQLite/type stripping is experimental. Linux Node 22/24 was checked;
   native Windows was tested by the user for the app, not available in the coding environment.
   Browser qualification is recorded in verification.md.

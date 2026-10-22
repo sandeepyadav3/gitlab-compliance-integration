@@ -26,8 +26,7 @@ is expected. Runtime package versions are pinned in `package-lock.json`.
 npm ci
 ```
 
-Copy `.env.example` to `.env` using your editor (preserve your existing `.env` when
-upgrading). Configure the token **server-side** with `read_api` scope:
+Copy `.env.example` to `.env`. Configure the token **server-side** with `read_api` scope:
 
 ```dotenv
 GITLAB_TOKEN=replace-me
@@ -53,20 +52,9 @@ then select **Start collection**. Inspect a project for restrictions, sources,
 and changes against its fixed baseline. The sidebar opens older runs; refreshing the
 page reconnects to an active collection. Your token stays on the server.
 
-When upgrading, preserve `.env` and `data/`, replace the source files, then rerun
-`npm ci` and `npm run build`. Stop the old server before starting the new one.
-The server initializes storage automatically. The following CLI commands are optional.
+The server creates and migrates the SQLite file on startup. `npm run db:setup` does the same initialization without starting the server. Files in `data/`, `.env`, and SQLite files are ignored by git. Keep databases that contain private project metadata local. Changing `DATABASE_PATH` leaves the previous database untouched.
 
-## Set up local storage
-
-```bash
-npm run db:setup
-```
-
-Creates the configured SQLite file and applies schema migrations through version 2. Other CLI
-commands also initialize storage automatically. Files in `data/`, `.env`, and SQLite
-files are ignored by git. Keep databases containing private project metadata local.
-When changing the storage path, the previous database remains untouched.
+The CLI commands in the next section are optional.
 
 ## Save a selection and collect
 
@@ -87,18 +75,21 @@ npm run history
 npm run history -- RUN_ID
 ```
 
-The CLI now uses the same bounded worker as the HTTP server (up to three projects
-at a time). It waits for completion and prints schema version 4, including a run ID,
+The CLI uses the same bounded worker as the HTTP server (up to three projects
+at a time). It waits for completion and prints output contract version 4, including a run ID,
 requested-ID snapshot, project outcomes, complete evidence, and fixed baseline run IDs.
+That number is the CLI JSON shape, not the storage schema. Storage schema is 3.
 Historical evidence is never overwritten by a later attempt. A `completed` run means
 execution finished, not that every project succeeded; inspect individual outcomes.
 
 Exit codes: `0` all requested projects complete; `2` some project results partial or
 failed; `1` configuration/storage/unexpected execution failure. On caught execution
-failure, preserve already-recorded outcomes and mark remaining projects interrupted.
+failure, preserve already-recorded outcomes, keep checkpointed in-flight reads as partial
+or failed evidence, and mark projects with no checkpoint interrupted.
 Collector startup marks unfinished work interrupted after taking exclusive ownership.
 A hard-killed process leaves a lease that expires within 15 seconds. Wait and restart;
-do not delete your database. Completed project evidence is retained.
+do not delete your database. Completed project evidence is retained, along with any
+in-flight reads already checkpointed.
 
 ## Start the asynchronous backend
 
@@ -108,7 +99,7 @@ npm start
 
 The server binds to `http://127.0.0.1:3001`. It initializes/migrates your database,
 acquires a collector lease, recovers old unfinished runs, and exposes the HTTP API.
-`/health` reports phase 7 and whether a token is configured (never its value).
+`/health` reports status and whether a token is configured (never its value).
 
 Keep the server running and use the HTTP API for collection. Do not run the collection
 CLI concurrently against the same database; it will refuse ownership. Read-only
@@ -127,7 +118,7 @@ replaying an old observation; start a new run explicitly after inspecting it.
 npm run verify
 ```
 
-This runs all 77 backend tests, backend/frontend type checks, the production build,
+This runs all 81 backend tests, backend/frontend type checks, the production build,
 and mocked failure/recovery assertions. For the additional automated browser checks:
 
 ```bash
@@ -159,7 +150,7 @@ configuration and history untouched. `npm run demo:verify` runs the credential-f
 scenario assertions and writes synthetic JSON evidence.
 
 See [demo walkthrough and live recording checklist](docs/demos.md). Live collection and
-setting changes have been confirmed by the user; sanitized live media still needs
+setting changes were checked on the seeded projects; sanitized live media still needs
 capturing before submission. The included mock evidence is explicitly synthetic.
 
 ## Recreate the three GitLab projects
@@ -188,7 +179,6 @@ existing default branch to assess and skips branch-specific configuration reques
 - [Frontend behavior and browser checks](docs/frontend.md)
 - [Storage design and baseline policy](docs/storage-design.md)
 - [GitLab API coverage](docs/api-coverage.md)
-- [Implementation phases](docs/phase-status.md)
 - [Test project verification](docs/test-projects.md)
 - [Verification results](docs/verification.md)
 - [Execution and recovery](docs/execution.md)
@@ -216,7 +206,7 @@ the implementation; passing AI-assisted tests alone is not a production-readines
 
 ## Compare collections
 
-The existing collection and history commands now include a comparison for each project.
+Collection and history include a comparison for each project.
 It identifies its fixed baseline, lists actual before/after setting changes, and
 separately describes availability changes. Equal settings in a different order do not
 create differences. Unreadable settings never become confirmed removals.
@@ -228,5 +218,5 @@ Invoke-RestMethod -Uri "http://127.0.0.1:3001/api/runs/$($collection.run.id)/com
 ```
 
 `$collection` is the POST response from your collection command. See the live change
-walkthrough in docs/http-api.md. Preserve `.env` and `data/` when replacing project files.
-The final checkpoint uses storage schema version 2 and does not rewrite stored observations.
+walkthrough in docs/http-api.md.
+Storage schema is version 3. Migrations do not rewrite stored observations.

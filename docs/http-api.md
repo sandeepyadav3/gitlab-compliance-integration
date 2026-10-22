@@ -1,11 +1,11 @@
-# Phase 3 HTTP API
+# HTTP API
 
 Base URL: `http://127.0.0.1:3001`. Token stays on the server. JSON bodies only;
 16 KiB maximum, 1-25 project IDs. The API accepts numeric IDs, not GitLab URLs or tokens.
 
 | Method | Path | Behavior |
 | --- | --- | --- |
-| GET | `/health` | Local liveness, phase, token-configured flag |
+| GET | `/health` | Local liveness and token-configured flag |
 | GET | `/api/selection` | Saved project IDs and update time |
 | PUT | `/api/selection` | Save `{ "projectIds": [123,456] }` |
 | POST | `/api/runs` | Queue `{ "projectIds": [123,456] }` or `{}` for saved selection; return 202 and Location |
@@ -17,20 +17,11 @@ Base URL: `http://127.0.0.1:3001`. Token stays on the server. JSON bodies only;
 
 POST IDs affect that run only. PUT changes the saved selection. Each run retains the
 selection snapshot it was created with. Environment `GITLAB_PROJECT_IDS` is a CLI
-default, not a browser/API selection source. Your Phase 2 CLI already saved selection
-in SQLite; the HTTP server reads that same database.
+default, not a browser/API selection source. The HTTP server reads the same SQLite database.
 
 ## Windows PowerShell walkthrough
 
-Stop the old server/CLI, replace code while preserving `.env` and `data/`, then:
-
-```powershell
-npm ci
-npm run db:setup
-npm start
-```
-
-In a second PowerShell terminal:
+With the server running (`npm start` after `npm ci`, `npm run db:setup`, and `npm run build`), use PowerShell:
 
 ```powershell
 Invoke-RestMethod -Uri 'http://127.0.0.1:3001/health'
@@ -68,20 +59,19 @@ Errors use `{ "error": { "code", "message", "requestId" } }`:
 - 500 sanitized unexpected local failure.
 
 Local requests are restricted to the server's localhost/127.0.0.1 Host and known browser
-origins, including the future Vite UI on localhost/127.0.0.1:5173. No sign-in is provided:
+origins, including the Vite dev server on localhost/127.0.0.1:5173. No sign-in is provided:
 this is a one-user local assessment, not a remotely exposed authenticated service.
 
-## Phase 4 comparisons
+## Comparisons
 
-Each run project's JSON now contains `comparison`, including its status, human-readable
+Each run project's JSON contains `comparison`, including its status, human-readable
 summary, fixed baseline reference, categorized changes, coverage changes, and notices.
 Run detail/history, project detail/history, and CLI history include this projection.
 For a concise comparison response use:
 
 `GET /api/runs/:id/comparisons`
 
-Existing stored evidence is unchanged. Your Phase 2/3 history is comparable immediately
-when a saved baseline exists; no database reset or re-import is needed.
+Comparisons are derived from stored observations. A saved baseline is used when one exists; evidence is not rewritten.
 
 ### Live change walkthrough (synthetic projects only)
 
@@ -107,8 +97,8 @@ See comparison-policy.md for missing fields, partial failures, normalization, an
 branch-scope decisions. Full comparison views do not claim settings were absent just
 because a GitLab call failed.
 
-## Built UI (Phase 5)
+## Built UI
 
 `npm run build` creates the React client; `npm start` serves it at the backend root.
-`GET /health` reports phase 7. Existing API contracts and PowerShell collection
+`GET /health` reports status and whether a token is configured. It has no phase field. Storage schema is 3. The CLI JSON shape is output contract 4. Existing API contracts and PowerShell collection
 commands remain available. See frontend.md for UI behavior and optional dev setup.

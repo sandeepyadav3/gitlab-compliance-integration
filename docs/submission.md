@@ -5,7 +5,7 @@
 - React/TypeScript UI, Node backend and SQLite persistence; pinned install and exact commands.
 - Real read-only GitLab API integration, explicit limits, provenance and safe errors.
 - Fixed historical baselines, meaningful comparisons, honest partial/stale evidence.
-- 77 backend tests, browser success/partial/recovery workflow and reproducible mock demo.
+- Backend tests, browser success/partial/recovery workflow and reproducible mock demo.
 - Synthetic demo JSON, seed-project instructions, API coverage, architecture/tradeoffs,
   recovery policies, production considerations and AI-use disclosure.
 
@@ -32,5 +32,4 @@
   `data/`, SQLite files, node_modules, dist and generated artifacts out of the commit.
 - Check that the README recording link and repository access work for the recipient.
 
-No deployment is required. The code and final package are ready; recording/link and
-submission-repository access are author-owned handoff actions, not completed by this checkpoint.
+No deployment is required. The recording link and submission-repository access are not done yet.

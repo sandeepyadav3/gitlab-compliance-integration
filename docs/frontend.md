@@ -1,10 +1,9 @@
-# Phase 5 analyst UI
+# Analyst UI
 
 ## Run
 
 After configuring the server-side `.env`, run `npm ci`, `npm run build`, then
 `npm start`. Open http://127.0.0.1:3001. No separate frontend process is required.
-Preserve your existing `.env` and `data/` when updating. SQLite schema remains version 2.
 Building is required after frontend source changes; the server returns a friendly
 setup message at `/` when the built client is missing. API routes remain available.
 

@@ -1,4 +1,4 @@
-# Phase 4 comparison policy (version 1)
+# Comparison policy (version 1)
 
 ## Fixed baseline and reproducibility
 

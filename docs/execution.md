@@ -1,4 +1,4 @@
-# Phase 3 execution and recovery
+# Execution and recovery
 
 ## Acceptance and progress
 
@@ -19,9 +19,11 @@ errors produce failed/partial evidence and do not stop unrelated projects.
 Each provider request has the existing timeout and bounded retry policy. A full run
 has a 120-second deadline, including retries and pagination. Deadline or shutdown
 aborts active fetch and retry sleeps. Workers are joined before terminalizing the run;
-no task can write after the service has released ownership. Interrupted in-flight
-projects have no completed snapshot; earlier completed project snapshots survive.
-Per-endpoint streaming persistence is not implemented. Unexpected execution errors
+no task can write after the service has released ownership. Reads that already returned
+are checkpointed. Interrupt and startup recovery promote those checkpoints to partial
+or failed evidence. Projects with no checkpoint stay interrupted and empty. Earlier
+completed project snapshots survive. A checkpoint is not a resume cursor: startup does
+not continue the old run. Unexpected execution errors
 interrupt unfinished work with a safe reason; exception text is never logged.
 
 ## Ownership and crash recovery
@@ -48,8 +50,9 @@ makes the worker unavailable and cancels ongoing work; the new owner performs re
 ## Migration and observability
 
 Schema version 2 adds a nullable interruption_reason column and a collector_lease table.
+Schema version 3 adds collection_checkpoints for in-flight reads.
 Version 1 run IDs, evidence JSON, timestamps, and baseline references are retained.
-No reset/deletion is performed. Stop older app versions before upgrading.
+No reset or deletion is performed.
 
 Structured JSON events report startup/recovery counts, run/project outcomes, duration,
 and safe request IDs/statuses. Logs omit tokens, headers, provider response bodies,
